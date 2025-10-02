@@ -8,18 +8,23 @@
       <button @click="executeCode" :disabled="loading">
         {{ loading ? 'Running...' : 'Run Code' }}
       </button>
-    </div>
-    
+      <AssistantButton
+        :code="code"
+        :language="language"
+        @ai-response="handleAIResponse"
+        @ai-error="handleAIError"
+      />    </div>
+
     <div class="editor-container">
       <div class="editor">
-        <MonacoEditor
-          v-model="code"
+        <vue-monaco-editor
+          v-model:value="code"
           :language="language"
           theme="vs-dark"
           :options="editorOptions"
         />
       </div>
-      
+
       <div class="output">
         <h3>Output:</h3>
         <pre>{{ output }}</pre>
@@ -33,13 +38,15 @@
 </template>
 
 <script>
-import { MonacoEditor } from '@monaco-editor/vue'
+import { VueMonacoEditor } from '@guolao/vue-monaco-editor'
 import axios from 'axios'
+import AssistantButton from './AssistantButton.vue';
 
 export default {
   name: 'CodeEditor',
   components: {
-    MonacoEditor
+    VueMonacoEditor,
+    AssistantButton
   },
   data() {
     return {
@@ -60,13 +67,13 @@ export default {
       this.loading = true
       this.output = ''
       this.error = ''
-      
+
       try {
         const response = await axios.post('http://localhost:5000/api/execute', {
           code: this.code,
           language: this.language
         })
-        
+
         this.output = response.data.output
         if (response.data.error) {
           this.error = response.data.error
@@ -76,9 +83,16 @@ export default {
       } finally {
         this.loading = false
       }
+    },
+    handleAIResponse(response) {
+      this.aiResponse = response;
+      this.output = `AI Assistant: ${response}`;
+    },
+    handleAIError(error) {
+      this.error = `AI Assistant Error: ${error}`;
     }
   }
-}
+};
 </script>
 
 <style scoped>

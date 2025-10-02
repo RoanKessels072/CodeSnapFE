@@ -16,6 +16,12 @@
     "format": "prettier --write src/"
   },
   "dependencies": {
+    "@guolao/vue-monaco-editor": "^1.5.5",
+    "axios": "^1.12.2",
+    "monaco": "^1.201704190613.0",
+    "monaco-editor": "^0.53.0",
+    "monaco-editor-vue": "^1.0.2",
+    "monaco-editor-vue3": "^1.0.4",
     "pinia": "^3.0.3",
     "vue": "^3.5.18",
     "vue-router": "^4.5.1"
