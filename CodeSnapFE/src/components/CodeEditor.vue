@@ -86,7 +86,7 @@ export default {
     },
     handleAIResponse(response) {
       this.aiResponse = response;
-      this.output = `AI Assistant: ${response}`;
+      this.output = response.response;
     },
     handleAIError(error) {
       this.error = `AI Assistant Error: ${error}`;
