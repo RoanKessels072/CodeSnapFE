@@ -1,82 +1,3 @@
-<template>
-  <div v-if="showErrorPopup" class="alert alert-danger alert-dismissible fade show position-fixed top-0 end-0 m-3" role="alert" style="z-index: 1050;">
-    {{ errorMessage }}
-    <button type="button" class="btn-close" @click="showErrorPopup = false"></button>
-  </div>
-
-  <div class="code-editor">
-    <div class="toolbar bg-light p-2 mb-3 rounded">
-      <div class="d-flex gap-2">
-        <select v-model="language" class="form-select" style="width: auto;">
-          <option value="python">Python</option>
-          <option value="javascript">JavaScript</option>
-        </select>
-        <button @click="executeCode" :disabled="loading" class="btn btn-success">
-          <span v-if="loading" class="spinner-border spinner-border-sm me-1"></span>
-          {{ loading ? 'Running...' : 'Run Code' }}
-        </button>
-        <AssistantButton
-          :code="code"
-          :language="language"
-          @ai-response="handleAIResponse"
-          @ai-error="handleAIError"
-        />
-      </div>
-    </div>
-
-    <div class="editor-container">
-      <div class="editor border rounded">
-        <vue-monaco-editor
-          v-model:value="code"
-          :language="language"
-          theme="vs-dark"
-          :options="editorOptions"
-        />
-      </div>
-
-      <div class="output border rounded bg-light p-3">
-        <h5>Output:</h5>
-        <pre class="mb-0">{{ output }}</pre>
-        <div v-if="error" class="alert alert-danger mt-3">
-          <h6>Error:</h6>
-          <pre class="mb-0">{{ error }}</pre>
-        </div>
-      </div>
-
-      <!-- Bootstrap Horizontal Collapsible AI Panel -->
-      <div class="d-flex">
-        <button
-          class="btn btn-primary btn-sm toggle-btn"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#aiPanelContent"
-          @click="aiPanelOpen = !aiPanelOpen"
-        >
-          {{ aiPanelOpen ? 'Close' : 'Open' }}
-        </button>
-
-        <div class="collapse collapse-horizontal show" id="aiPanelContent">
-          <div class="card card-body ai-panel-card">
-            <div class="d-flex justify-content-between align-items-center mb-2">
-              <h5 class="mb-0">AI Suggestions</h5>
-              <button
-                @click="applyAISuggestions"
-                :disabled="!aiResponse"
-                class="btn btn-sm btn-success"
-              >
-                Apply
-              </button>
-            </div>
-            <div class="ai-content">
-              <pre class="mb-0">{{ aiResponse || 'No AI suggestions yet. Click the AI Assistant button to get help.' }}</pre>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</template>
-
 <script>
 import { VueMonacoEditor } from '@guolao/vue-monaco-editor'
 import axios from 'axios'
@@ -88,9 +9,15 @@ export default {
     VueMonacoEditor,
     AssistantButton
   },
+  props: {
+    exercise: {
+      type: Object,
+      default: null
+    }
+  },
   data() {
     return {
-      code: 'print("Hello, World!")',
+      code: '',
       language: 'python',
       output: '',
       error: '',
@@ -107,14 +34,33 @@ export default {
       }
     }
   },
+  mounted() {
+    // Load exercise starter code if available
+    if (this.exercise) {
+      this.code = this.exercise.starter_code || 'print("Hello, World!")';
+      this.language = this.exercise.language || 'python';
+    } else {
+      this.code = 'print("Hello, World!")';
+    }
+  },
+  watch: {
+    exercise(newExercise) {
+      if (newExercise) {
+        this.code = newExercise.starter_code || 'print("Hello, World!")';
+        this.language = newExercise.language || 'python';
+      }
+    }
+  },
   methods: {
     async executeCode() {
+      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
+
       this.loading = true
       this.output = ''
       this.error = ''
 
       try {
-        const response = await axios.post('http://localhost:5000/api/execute', {
+        const response = await axios.post(`${API_BASE_URL}/api/code/execute`, {
           code: this.code,
           language: this.language
         })
