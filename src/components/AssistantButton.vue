@@ -17,6 +17,10 @@ export default {
     language: {
       type: String,
       required: true
+    },
+    exercise: {
+      type: Object,
+      required: true,
     }
   },
   data() {
@@ -28,9 +32,12 @@ export default {
     async callAIAssistant() {
       this.loading = true;
       try {
-        const response = await axios.post('http://localhost:5000/api/ai-assistant', {
+        const response = await axios.post('http://localhost:5000/api/ai/ai-assistant', {
           code: this.code,
-          language: this.language
+          language: this.language,
+          exercise_name: this.exercise.name,
+          exercise_description: this.exercise.description,
+          reference_solution: this.exercise.reference_solution
         });
         this.$emit('ai-response', response.data);
       } catch (error) {

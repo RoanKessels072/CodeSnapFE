@@ -2,7 +2,7 @@
   <div id="app">
     <header>
       <div class="container d-flex justify-content-between align-items-center">
-        <h1>{{ exercise ? exercise.name : 'AI Coding Sandbox' }}</h1>
+        <h1>CodeSnap</h1>
         <router-link to="/" class="btn btn-light">
           <i class="bi bi-arrow-left"></i> Back to Exercises
         </router-link>
@@ -21,7 +21,7 @@
 
       <div v-else-if="exercise">
         <div class="mb-3">
-          <h4>Description</h4>
+          <h4>{{ exercise.name }}</h4>
           <p>{{ exercise.description }}</p>
           <div class="d-flex gap-3 align-items-center">
             <span class="badge bg-secondary">{{ exercise.language }}</span>

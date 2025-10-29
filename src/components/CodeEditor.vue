@@ -1,3 +1,96 @@
+<template>
+  <div class="code-editor">
+
+    <!-- Error Popup -->
+    <div
+      v-if="showErrorPopup"
+      class="alert alert-danger alert-dismissible fade show position-fixed top-0 end-0 m-3"
+      role="alert"
+      style="z-index: 1050;"
+    >
+      {{ errorMessage }}
+      <button type="button" class="btn-close" @click="showErrorPopup = false"></button>
+    </div>
+
+    <!-- Toolbar -->
+    <div class="toolbar bg-light p-2 mb-3 rounded d-flex gap-2">
+      <select v-model="language" class="form-select" style="width: auto;">
+        <option value="python">Python</option>
+        <option value="javascript">JavaScript</option>
+      </select>
+      <button @click="executeCode" :disabled="loading" class="btn btn-success">
+        <span v-if="loading" class="spinner-border spinner-border-sm me-1"></span>
+        {{ loading ? 'Running...' : 'Run Code' }}
+      </button>
+      <AssistantButton
+        :code="code"
+        :language="language"
+        :exercise="exercise"
+        @ai-response="handleAIResponse"
+        @ai-error="handleAIError"
+      />
+    </div>
+
+    <div class="editor-container">
+
+      <!-- Monaco Editor -->
+      <div class="editor border rounded">
+        <VueMonacoEditor
+          v-model:value="code"
+          :language="language"
+          :options="editorOptions"
+        />
+      </div>
+
+      <!-- Output -->
+      <div class="output border rounded bg-light p-3">
+        <h5>Output:</h5>
+        <pre class="mb-0">{{ output }}</pre>
+        <div v-if="error" class="alert alert-danger mt-3">
+          <h6>Error:</h6>
+          <pre class="mb-0">{{ error }}</pre>
+        </div>
+      </div>
+
+      <!-- AI Panel -->
+      <div class="d-flex align-items-stretch">
+  <!-- Toggle button -->
+  <button
+    class="btn btn-primary btn-sm toggle-btn"
+    type="button"
+    data-bs-toggle="collapse"
+    data-bs-target="#aiPanel"
+    aria-expanded="true"
+    aria-controls="aiPanel"
+  >
+        {{ aiPanelOpen ? 'Close' : 'Open' }}
+  </button>
+
+  <!-- Bootstrap-controlled collapse -->
+  <div class="collapse collapse-horizontal show" id="aiPanel">
+    <div class="card card-body ai-panel-card">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <h5 class="mb-0">AI Suggestions</h5>
+        <button
+          @click="applyAISuggestions"
+          :disabled="!aiResponse"
+          class="btn btn-sm btn-success"
+        >
+          Apply
+        </button>
+      </div>
+      <div class="ai-content">
+        <pre class="mb-0">
+          {{ aiResponse || 'No AI suggestions yet. Click the AI Assistant button to get help.' }}
+        </pre>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+  </div>
+</template>
+
 <script>
 import { VueMonacoEditor } from '@guolao/vue-monaco-editor'
 import axios from 'axios'
@@ -35,8 +128,17 @@ export default {
     }
   },
   mounted() {
-    // Load exercise starter code if available
+    const aiPanel = document.getElementById('aiPanel')
+    if (aiPanel) {
+      aiPanel.addEventListener('shown.bs.collapse', () => {
+        this.aiPanelOpen = true
+      })
+      aiPanel.addEventListener('hidden.bs.collapse', () => {
+        this.aiPanelOpen = false
+      })
+    }
     if (this.exercise) {
+      console.log(this.exercise);
       this.code = this.exercise.starter_code || 'print("Hello, World!")';
       this.language = this.exercise.language || 'python';
     } else {
@@ -104,7 +206,7 @@ export default {
 
 <style scoped>
 .code-editor {
-  height: 100%;
+  height: 100vh;
   display: flex;
   flex-direction: column;
 }
@@ -114,7 +216,7 @@ export default {
   display: grid;
   grid-template-columns: 1fr 1fr auto;
   gap: 1rem;
-  height: 500px;
+  height: 100%;
 }
 
 .output {
