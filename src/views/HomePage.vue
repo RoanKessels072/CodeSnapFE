@@ -1,15 +1,10 @@
-<script setup>
-import HomeNavbar from '@/components/HomeNavbar.vue';
-</script>
-
 <template>
   <div>
-    <HomeNavbar />
     <div class="container mt-5">
       <div class="text-center">
         <h1>Welcome to CodeSnap!</h1>
         <p class="lead">
-          This is a placeholder homepage. Navigate using the menu above.
+          The Homepage is still under construction, so use the navbar.
         </p>
         <router-link to="/exercises" class="btn btn-primary mt-3">
           View Exercises

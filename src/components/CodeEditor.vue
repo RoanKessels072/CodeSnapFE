@@ -1,7 +1,9 @@
+<script setup>
+  import SubmitButton from './SubmitButton.vue'
+</script>
+
 <template>
   <div class="code-editor">
-
-    <!-- Error Popup -->
     <div
       v-if="showErrorPopup"
       class="alert alert-danger alert-dismissible fade show position-fixed top-0 end-0 m-3"
@@ -12,28 +14,31 @@
       <button type="button" class="btn-close" @click="showErrorPopup = false"></button>
     </div>
 
-    <!-- Toolbar -->
     <div class="toolbar bg-light p-2 mb-3 rounded d-flex gap-2">
-      <select v-model="language" class="form-select" style="width: auto;">
-        <option value="python">Python</option>
-        <option value="javascript">JavaScript</option>
-      </select>
       <button @click="executeCode" :disabled="loading" class="btn btn-success">
         <span v-if="loading" class="spinner-border spinner-border-sm me-1"></span>
         {{ loading ? 'Running...' : 'Run Code' }}
       </button>
       <AssistantButton
+        v-if="mode === 'assistant'"
         :code="code"
         :language="language"
         :exercise="exercise"
         @ai-response="handleAIResponse"
         @ai-error="handleAIError"
       />
+      <SubmitButton
+        :mode="mode"
+        :code="code"
+        :language="language"
+        :exercise-id="exercise.id"
+        @submitted="handleSubmission"
+        @error="handleSubmissionError"
+      />
     </div>
 
     <div class="editor-container">
 
-      <!-- Monaco Editor -->
       <div class="editor border rounded">
         <VueMonacoEditor
           v-model:value="code"
@@ -42,7 +47,6 @@
         />
       </div>
 
-      <!-- Output -->
       <div class="output border rounded bg-light p-3">
         <h5>Output:</h5>
         <pre class="mb-0">{{ output }}</pre>
@@ -52,21 +56,17 @@
         </div>
       </div>
 
-      <!-- AI Panel -->
-      <div class="d-flex align-items-stretch">
-  <!-- Toggle button -->
+  <div
+  v-if="mode === 'assistant'"
+  class="d-flex align-items-stretch">
   <button
     class="btn btn-primary btn-sm toggle-btn"
     type="button"
-    data-bs-toggle="collapse"
-    data-bs-target="#aiPanel"
-    aria-expanded="true"
-    aria-controls="aiPanel"
+    @click="toggleAIPanel"
   >
         {{ aiPanelOpen ? 'Close' : 'Open' }}
   </button>
 
-  <!-- Bootstrap-controlled collapse -->
   <div class="collapse collapse-horizontal show" id="aiPanel">
     <div class="card card-body ai-panel-card">
       <div class="d-flex justify-content-between align-items-center mb-2">
@@ -95,13 +95,12 @@
 import { VueMonacoEditor } from '@guolao/vue-monaco-editor'
 import axios from 'axios'
 import AssistantButton from './AssistantButton.vue';
+import { useRoute } from 'vue-router'
+import { Collapse } from 'bootstrap'
 
 export default {
   name: 'CodeEditor',
-  components: {
-    VueMonacoEditor,
-    AssistantButton
-  },
+  components: { VueMonacoEditor, AssistantButton},
   props: {
     exercise: {
       type: Object,
@@ -117,6 +116,7 @@ export default {
       loading: false,
       aiResponse: '',
       aiPanelOpen: true,
+      bsCollapse: null,
       showErrorPopup: false,
       errorMessage: '',
       retryTimeout: null,
@@ -124,33 +124,22 @@ export default {
         automaticLayout: true,
         fontSize: 14,
         minimap: { enabled: false }
-      }
+      },
+      mode: 'assistant'
     }
   },
   mounted() {
-    const aiPanel = document.getElementById('aiPanel')
-    if (aiPanel) {
-      aiPanel.addEventListener('shown.bs.collapse', () => {
-        this.aiPanelOpen = true
-      })
-      aiPanel.addEventListener('hidden.bs.collapse', () => {
-        this.aiPanelOpen = false
-      })
+    const route = useRoute()
+    this.mode = route.query.mode || 'assistant';
+    if (this.mode === 'assistant') {
+      const aiPanel = document.getElementById('aiPanel')
+      if (aiPanel) {
+        this.bsCollapse = new Collapse(aiPanel, { toggle: false })
+      }
     }
     if (this.exercise) {
-      console.log(this.exercise);
       this.code = this.exercise.starter_code || 'print("Hello, World!")';
       this.language = this.exercise.language || 'python';
-    } else {
-      this.code = 'print("Hello, World!")';
-    }
-  },
-  watch: {
-    exercise(newExercise) {
-      if (newExercise) {
-        this.code = newExercise.starter_code || 'print("Hello, World!")';
-        this.language = newExercise.language || 'python';
-      }
     }
   },
   methods: {
@@ -182,23 +171,31 @@ export default {
       this.aiPanelOpen = true;
     },
     handleAIError(error) {
-      this.errorMessage = `AI Assistant Error: ${error}`;
-      this.showErrorPopup = true;
-      if (error.toLowerCase().includes("overload")) {
-        this.retryTimeout = setTimeout(() => {
-          this.showErrorPopup = false;
-          this.executeAIRequest();
-        }, 3000);
-      } else {
-        setTimeout(() => {
-          this.showErrorPopup = false;
-        }, 5000);
-      }
+      this.errorMessage = `AI Assistant Error: ${error}`
+      this.showErrorPopup = true
+      setTimeout(() => (this.showErrorPopup = false), 5000)
     },
     applyAISuggestions() {
       if (this.aiResponse) {
         this.code = this.aiResponse;
       }
+    },
+    toggleAIPanel() {
+    if (this.bsCollapse) {
+      if (this.aiPanelOpen) {
+        this.bsCollapse.hide()
+      } else {
+        this.bsCollapse.show()
+      }
+      this.aiPanelOpen = !this.aiPanelOpen
+    }
+    },
+    handleSubmission(result) {
+      console.log("Grading result:", result)
+      // TODO: display result or feedback modal
+    },
+    handleSubmissionError(err) {
+      console.error("Submission failed:", err)
     }
   }
 };

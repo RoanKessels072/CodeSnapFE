@@ -23,9 +23,6 @@
           <li class="nav-item">
             <router-link class="nav-link" to="/exercises">Exercises</router-link>
           </li>
-          <li class="nav-item">
-            <router-link class="nav-link" to="/exercise/:id">Sandbox</router-link>
-          </li>
         </ul>
       </div>
     </div>

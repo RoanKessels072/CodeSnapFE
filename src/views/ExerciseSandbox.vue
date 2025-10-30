@@ -1,13 +1,5 @@
 <template>
   <div id="app">
-    <header>
-      <div class="container d-flex justify-content-between align-items-center">
-        <h1>CodeSnap</h1>
-        <router-link to="/" class="btn btn-light">
-          <i class="bi bi-arrow-left"></i> Back to Exercises
-        </router-link>
-      </div>
-    </header>
     <main>
       <div v-if="loading" class="text-center mt-5">
         <div class="spinner-border text-primary" role="status">
