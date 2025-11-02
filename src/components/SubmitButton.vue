@@ -47,17 +47,15 @@ async function submit() {
   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'
 
   try {
-    let endpoint =
-      props.mode === 'rival'
-        ? '/api/grade/rival'
-        : '/api/grade/assistant'
-
-    const response = await axios.post(`${API_BASE_URL}${endpoint}`, {
+    console.log('Submitting code:', props.code)
+    const response = await axios.post(`${API_BASE_URL}/api/attempts/`, {
       code: props.code,
-      language: props.language,
       exerciseId: props.exerciseId
-    })
-
+    },{
+      headers: {
+        'Content-Type': 'application/json'
+      }
+  })
     emit('submitted', response.data)
   } catch (err) {
     emit('error', err)
