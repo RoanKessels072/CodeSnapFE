@@ -11,7 +11,7 @@
 
 <script setup>
 import { ref, computed } from 'vue'
-import axios from 'axios'
+import api from '../api';
 
 const props = defineProps({
   mode: {
@@ -43,24 +43,18 @@ const buttonText = computed(() => {
 })
 
 async function submit() {
-  loading.value = true
-  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'
-
+  loading.value = true;
   try {
-    console.log('Submitting code:', props.code)
-    const response = await axios.post(`${API_BASE_URL}/api/attempts/`, {
+    console.log('Submitting code:', props.code);
+    const response = await api.post('/api/attempts/', {
       code: props.code,
       exerciseId: props.exerciseId
-    },{
-      headers: {
-        'Content-Type': 'application/json'
-      }
-  })
-    emit('submitted', response.data)
+    });
+    emit('submitted', response.data);
   } catch (err) {
-    emit('error', err)
+    emit('error', err);
   } finally {
-    loading.value = false
+    loading.value = false;
   }
 }
 </script>

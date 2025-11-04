@@ -5,7 +5,7 @@
 </template>
 
 <script>
-import axios from 'axios';
+import api from '../api';
 
 export default {
   name: 'AssistantButton',
@@ -30,9 +30,9 @@ export default {
   },
   methods: {
     async callAIAssistant() {
-      this.loading = true;
-      try {
-        const response = await axios.post('http://localhost:5000/api/ai/ai-assistant', {
+    this.loading = true;
+    try {
+        const response = await api.post('/api/ai/ai-assistant', {
           code: this.code,
           language: this.language,
           exercise_name: this.exercise.name,

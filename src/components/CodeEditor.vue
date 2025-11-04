@@ -93,7 +93,7 @@
 
 <script>
 import { VueMonacoEditor } from '@guolao/vue-monaco-editor'
-import axios from 'axios'
+import api from '../api';
 import AssistantButton from './AssistantButton.vue';
 import { useRoute } from 'vue-router'
 import { Collapse } from 'bootstrap'
@@ -143,29 +143,27 @@ export default {
     }
   },
   methods: {
-    async executeCode() {
-      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
+  async executeCode() {
+    this.loading = true;
+    this.output = '';
+    this.error = '';
 
-      this.loading = true
-      this.output = ''
-      this.error = ''
+    try {
+      const response = await api.post('/api/code/execute', {
+        code: this.code,
+        language: this.language
+      });
 
-      try {
-        const response = await axios.post(`${API_BASE_URL}/api/code/execute`, {
-          code: this.code,
-          language: this.language
-        })
-
-        this.output = response.data.output
-        if (response.data.error) {
-          this.error = response.data.error
-        }
-      } catch (error) {
-        this.error = 'Failed to connect to backend: ' + error.message
-      } finally {
-        this.loading = false
+      this.output = response.data.output;
+      if (response.data.error) {
+        this.error = response.data.error;
       }
-    },
+    } catch (error) {
+      this.error = 'Failed to connect to backend: ' + error.message;
+    } finally {
+      this.loading = false;
+    }
+  },
     handleAIResponse(response) {
       this.aiResponse = response.response;
       this.aiPanelOpen = true;

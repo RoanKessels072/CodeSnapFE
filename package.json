@@ -20,6 +20,7 @@
     "@guolao/vue-monaco-editor": "^1.5.5",
     "axios": "^1.12.2",
     "bootstrap": "^5.3.8",
+    "keycloak-js": "^26.2.1",
     "monaco": "^1.201704190613.0",
     "monaco-editor": "^0.53.0",
     "monaco-editor-vue": "^1.0.2",

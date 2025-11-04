@@ -2,7 +2,9 @@
   <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <div class="container">
       <router-link class="navbar-brand" to="/">CodeSnap</router-link>
-
+      <div class="nav-item" v-if="state.authenticated">
+        <span class="nav-link">Logged in as: {{ state.userProfile?.username }}</span>
+      </div>
       <button
         class="navbar-toggler"
         type="button"
@@ -23,6 +25,21 @@
           <li class="nav-item">
             <router-link class="nav-link" to="/exercises">Exercises</router-link>
           </li>
+          <li class="nav-item" v-if="!state.authenticated">
+            <button class="btn btn-outline-primary me-2" @click="handleRegister">
+              Register
+            </button>
+          </li>
+          <li class="nav-item" v-if="!state.authenticated">
+            <button class="btn btn-outline-primary" @click="login()">
+              Login
+            </button>
+          </li>
+          <li class="nav-item" v-if="state.authenticated">
+            <button class="btn btn-outline-danger" @click="handleLogout">
+              Logout
+            </button>
+          </li>
         </ul>
       </div>
     </div>
@@ -30,6 +47,15 @@
 </template>
 
 <script setup>
+import { state, login, logout, register } from "../keycloak";
+
+function handleLogout() {
+  logout();
+}
+
+function handleRegister() {
+  register();
+}
 </script>
 
 <style scoped>
