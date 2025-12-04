@@ -8,5 +8,5 @@
 </template>
 
 <script setup>
-import ExerciseList from "@/components/ExerciseList.vue";
+import ExerciseList from '@/components/ExerciseList.vue';
 </script>

@@ -39,6 +39,8 @@
 import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import CodeEditor from '@/components/CodeEditor.vue';
+import api from '../api';
+
 
 export default {
   name: 'ExerciseSandbox',
@@ -51,15 +53,12 @@ export default {
     const loading = ref(true);
     const error = ref(null);
 
-    const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
-
     onMounted(async () => {
       const exerciseId = route.params.id;
 
       try {
-        const res = await fetch(`${API_BASE_URL}/api/exercises/${exerciseId}`);
-        if (!res.ok) throw new Error('Failed to load exercise');
-        exercise.value = await res.json();
+        const res = await api.get(`/api/exercises/${exerciseId}`);
+        exercise.value = res.data;
       } catch (err) {
         console.error('Error loading exercise:', err);
         error.value = 'Failed to load exercise. Please try again.';

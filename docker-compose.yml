@@ -3,11 +3,12 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        VITE_API_BASE_URL: http://localhost:5000
+        VITE_KEYCLOAK_URL: http://localhost:8080
     container_name: codesnap-frontend
     ports:
       - "3000:80"
-    environment:
-      - VITE_API_BASE_URL=http://localhost:5000
     networks:
       - codesnap-network
     restart: unless-stopped
@@ -20,4 +21,4 @@ services:
 
 networks:
   codesnap-network:
-    driver: bridge
+    external: true

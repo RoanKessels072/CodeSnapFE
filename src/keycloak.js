@@ -18,9 +18,9 @@ export function initKeycloak() {
 
     keycloak.init({
       onLoad: "check-sso",
+      checkLoginIframe: false,
       silentCheckSsoRedirectUri: window.location.origin + "/silent-check-sso.html",
       pkceMethod: 'S256',
-      checkLoginIframe: false
     }).then(authenticated => {
       state.authenticated = !!authenticated;
 
@@ -40,6 +40,10 @@ export function initKeycloak() {
       reject(err);
     });
   });
+}
+
+export function getKeycloak() {
+  return keycloak;
 }
 
 export function getToken() {

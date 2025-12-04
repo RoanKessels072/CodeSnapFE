@@ -4,7 +4,7 @@
       <div class="text-center">
         <h1>Welcome to CodeSnap!</h1>
         <p class="lead">
-          The Homepage is still under construction, so use the navbar.
+          The Homepage is still under construction, so please use the navbar.
         </p>
         <router-link to="/exercises" class="btn btn-primary mt-3">
           View Exercises

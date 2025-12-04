@@ -10,18 +10,14 @@ import router from './router'
 const app = createApp(App)
 
 app.use(createPinia())
-app.use(router)
-app.mount('#app')
 
-initKeycloak()
-  .then(authenticated => {
-    if (authenticated) {
-      console.log("User is logged in.")
-    } else {
-      console.log("User not logged in.")
-    }
-  })
-  .catch(err => console.error("Keycloak init failed:", err))
+initKeycloak().then(() => {
+    app.use(router)
+    app.mount('#app')
+}).catch(() => {
+    app.use(router)
+    app.mount('#app')
+})
 
 app.use(VueMonacoEditorPlugin, {
   paths: {

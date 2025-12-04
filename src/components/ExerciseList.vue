@@ -1,78 +1,124 @@
 <template>
-  <div class="row g-4">
-    <div
-  v-for="exercise in exercises"
-  :key="exercise.id"
-  class="col-12 col-md-6 col-lg-4"
->
-  <div
-    class="card h-100 shadow-sm"
-    @click="openModeModal(exercise)"
-    style="cursor: pointer"
-  >
-    <div class="card-body d-flex flex-column">
-      <h5 class="card-title mb-2">{{ exercise.name }}</h5>
-      <p class="card-text flex-grow-1">{{ exercise.description }}</p>
+  <div class="container mt-4">
+    <h2 class="mb-4">Available Exercises</h2>
 
-      <div class="mb-2">
-        <i
-          v-for="n in 5"
-          :key="n"
-          :class="getFireIcon(n, exercise.difficulty)"
-          class="me-1"
-        ></i>
-        <small class="text-muted ms-1">({{ exercise.difficulty }}/5)</small>
+    <div v-if="loading" class="text-center mt-5">
+      <div class="spinner-border" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </div>
+
+    <div v-else class="row g-4">
+      <div
+        v-for="exercise in exercises"
+        :key="exercise.id"
+        class="col-md-6 col-lg-4"
+      >
+        <div
+          class="card h-100 shadow-sm exercise-card"
+          @click="openModeModal(exercise)"
+        >
+          <div class="card-body d-flex flex-column">
+            <h5 class="card-title">{{ exercise.name }}</h5>
+            <p class="card-text text-muted flex-grow-1">{{ exercise.description }}</p>
+
+            <div class="mb-3">
+              <span class="badge bg-secondary me-2">{{ exercise.language }}</span>
+              <div class="d-inline-block">
+                <i
+                  v-for="n in 5"
+                  :key="n"
+                  :class="getFireIcon(n, exercise.difficulty)"
+                  class="me-1"
+                ></i>
+                <small class="text-muted">({{ exercise.difficulty }}/5)</small>
+              </div>
+            </div>
+
+            <div v-if="getBestAttempt(exercise.id)" class="alert alert-info py-2 mb-0 mt-auto">
+              <small class="d-block mb-1"><strong>Your Best:</strong></small>
+              <div class="d-flex align-items-center gap-2">
+                <div>
+                  <i
+                    v-for="n in 3"
+                    :key="n"
+                    :class="n <= getBestAttempt(exercise.id).stars ? 'bi bi-star-fill text-warning' : 'bi bi-star text-muted'"
+                  ></i>
+                </div>
+                <small class="text-muted">Score: {{ getBestAttempt(exercise.id).score }}/10</small>
+              </div>
+            </div>
+
+          </div>
+        </div>
       </div>
 
-      <span class="badge bg-secondary align-self-start">
-        {{ exercise.language }}
-      </span>
+      <div v-if="!exercises.length" class="text-center text-muted mt-5">
+        No exercises found.
+      </div>
     </div>
-  </div>
-</div>
 
-    <div v-if="!exercises.length" class="text-center text-muted mt-5">
-      No exercises found.
-    </div>
-  </div>
     <ModeModal ref="modeModal" @select-mode="startExercise" />
+  </div>
 </template>
 
 <script setup>
 import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
+import api from '../api';
 import ModeModal from "@/components/ModeModal.vue";
 
-const exercises = ref([]);
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
-const selectedExercise = ref(null);
 const router = useRouter();
-const modeModal = ref(null);
+const exercises = ref([]);
+const bestAttempts = ref({});
+const loading = ref(true);
 
+const selectedExercise = ref(null);
+const modeModal = ref(null);
 
 onMounted(async () => {
   try {
-    const res = await fetch(`${API_BASE_URL}/api/exercises`);
-    if (!res.ok) throw new Error("Failed to load exercises");
-    exercises.value = await res.json();
-    console.log("Loaded exercises:", exercises.value);
+    const exercisesRes = await api.get('/api/exercises/');
+    exercises.value = exercisesRes.data;
+
+    try {
+      const attemptsRes = await api.get('/api/attempts/best');
+      bestAttempts.value = attemptsRes.data;
+    } catch (err) {
+      console.warn("No best attempts yet or error fetching:", err);
+      bestAttempts.value = {};
+    }
+
   } catch (err) {
     console.error("Error fetching exercises:", err);
+  } finally {
+    loading.value = false;
   }
 });
+
+function getBestAttempt(exerciseId) {
+  return bestAttempts.value[exerciseId] || null;
+}
 
 function openModeModal(exercise) {
   selectedExercise.value = exercise;
   modeModal.value.show();
 }
 
-function startExercise(mode) {
+function startExercise(modeData) {
   if (!selectedExercise.value) return;
+
+  const query = {
+    mode: modeData.mode,
+    ...(modeData.difficulty && { difficulty: modeData.difficulty })
+  };
+
   router.push({
     name: "ExerciseSandbox",
     params: { id: selectedExercise.value.id },
-    query: { mode },
+    query: query,
   });
+
   selectedExercise.value = null;
 }
 
@@ -85,13 +131,16 @@ function getFireIcon(n, difficulty) {
 </script>
 
 <style scoped>
-.card {
+/* Combined Styles */
+.exercise-card {
+  cursor: pointer;
   border-radius: 1rem;
-  transition: transform 0.2s;
+  transition: transform 0.2s, box-shadow 0.2s;
 }
 
-.card:hover {
-  transform: translateY(-4px);
+.exercise-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
 }
 
 .card-title {
@@ -100,5 +149,9 @@ function getFireIcon(n, difficulty) {
 
 .bi-fire {
   font-size: 1.1rem;
+}
+
+.bi-star, .bi-star-fill {
+  font-size: 0.9rem;
 }
 </style>
