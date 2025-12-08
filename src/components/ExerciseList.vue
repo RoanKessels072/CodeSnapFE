@@ -78,11 +78,11 @@ const modeModal = ref(null);
 
 onMounted(async () => {
   try {
-    const exercisesRes = await api.get('/api/exercises/');
+    const exercisesRes = await api.get('/exercises/');
     exercises.value = exercisesRes.data;
 
     try {
-      const attemptsRes = await api.get('/api/attempts/best');
+      const attemptsRes = await api.get('/attempts/best');
       bestAttempts.value = attemptsRes.data;
     } catch (err) {
       console.warn("No best attempts yet or error fetching:", err);

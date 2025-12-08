@@ -32,7 +32,7 @@ export default {
     async callAIAssistant() {
     this.loading = true;
     try {
-        const response = await api.post('/api/ai/ai-assistant', {
+        const response = await api.post('/ai/assistant', {
           code: this.code,
           language: this.language,
           exercise_name: this.exercise.name,

@@ -364,7 +364,7 @@ export default {
       this.error = '';
 
       try {
-        const response = await api.post('/api/code/execute', {
+        const response = await api.post('/code/execute', {
           code: this.code,
           language: this.language
         });

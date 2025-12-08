@@ -68,23 +68,26 @@ async function submit() {
 }
 
 async function submitAssistantMode() {
-  const response = await api.post('/api/attempts/', {
+  const response = await api.post('/attempts/', {
     code: props.code,
-    exerciseId: props.exerciseId
+    exercise_id: props.exerciseId
   });
 
   emit('submitted', response.data);
 }
 
 async function submitRivalMode() {
-  const response = await api.post('/api/ai/ai-rival', {
-    language: props.language,
+  const response = await api.post('/ai/rival', {
+    exercise_id: props.exerciseId,
     exercise_name: props.exercise?.name || 'Unknown Exercise',
     exercise_description: props.exercise?.description || '',
-    exercise_id: props.exerciseId,
-    exercise_starter_code: props.exercise?.starter_code || '',
+    language: props.language,
     difficulty: props.difficulty,
-    user_code: props.code
+
+    starter_code: props.exercise?.starter_code || '',
+
+    function_name: props.exercise?.function_name,
+    test_cases: props.exercise?.test_cases || []
   });
 
   emit('submitted', response.data);

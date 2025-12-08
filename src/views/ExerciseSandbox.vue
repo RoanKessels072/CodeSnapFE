@@ -57,7 +57,7 @@ export default {
       const exerciseId = route.params.id;
 
       try {
-        const res = await api.get(`/api/exercises/${exerciseId}`);
+        const res = await api.get(`/exercises/${exerciseId}`);
         exercise.value = res.data;
       } catch (err) {
         console.error('Error loading exercise:', err);
