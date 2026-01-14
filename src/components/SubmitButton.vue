@@ -68,10 +68,14 @@ async function submit() {
 }
 
 async function submitAssistantMode() {
-  const response = await api.post('/attempts/', {
+  let response = await api.post('/attempts/', {
     code: props.code,
     exercise_id: props.exerciseId
   });
+
+  if (response.data?.status === 'pending') {
+    response = await pollStatus(() => api.get(`/attempts/${response.data.id}`));
+  }
 
   emit('submitted', response.data);
 }
@@ -83,6 +87,7 @@ async function submitRivalMode() {
     exercise_description: props.exercise?.description || '',
     language: props.language,
     difficulty: props.difficulty,
+    code: props.code,
 
     starter_code: props.exercise?.starter_code || '',
 
@@ -90,6 +95,38 @@ async function submitRivalMode() {
     test_cases: props.exercise?.test_cases || []
   });
 
-  emit('submitted', response.data);
+  let userAttempt = response.data.user_attempt;
+  const aiRival = response.data.ai_rival;
+  if (!userAttempt) {
+    console.error('Missing user_attempt in response:', response.data);
+    throw new Error('Invalid response: missing user_attempt');
+  }
+
+  if (userAttempt.status === 'pending') {
+    const pollResponse = await pollStatus(() => api.get(`/attempts/${userAttempt.id}`));
+    userAttempt = pollResponse.data;
+  }
+
+  emit('submitted', {
+    user_result: userAttempt,
+    ai_result: aiRival
+  });
+}
+
+async function pollStatus(apiCall) {
+  const pollInterval = 1000;
+
+  while (true) {
+    await new Promise(resolve => setTimeout(resolve, pollInterval));
+    const response = await apiCall();
+
+    if (response.data.status === 'completed') {
+      return response;
+    }
+
+    if (response.data.status === 'failed' || response.data.status === 'error') {
+      throw new Error(response.data.error || 'Grading failed');
+    }
+  }
 }
 </script>

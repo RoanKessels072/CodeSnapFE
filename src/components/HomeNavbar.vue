@@ -25,6 +25,9 @@
           <li class="nav-item">
             <router-link class="nav-link" to="/exercises">Exercises</router-link>
           </li>
+          <li class="nav-item">
+            <router-link class="nav-link" to="/privacy-policy">Privacy Policy</router-link>
+          </li>
           <li class="nav-item" v-if="!isAuthenticated">
             <button class="btn btn-outline-primary me-2" @click="handleRegister">
               Register

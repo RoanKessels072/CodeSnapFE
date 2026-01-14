@@ -21,6 +21,11 @@ const routes = [
     name: 'ExerciseList',
     component: ExercisesOverview,
     meta: { requiresAuth: true }
+  },
+  {
+    path: '/privacy-policy',
+    name: 'PrivacyPolicy',
+    component: () => import('@/views/PrivacyPolicy.vue')
   }
 ]
 

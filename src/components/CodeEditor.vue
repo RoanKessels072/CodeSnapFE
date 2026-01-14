@@ -109,8 +109,15 @@
           <div class="modal-body text-center py-4">
             <h3 class="mb-4">Submission Results</h3>
 
+            <!-- Score Display -->
+            <div class="score-circle mx-auto mb-4" :class="getScoreClass(submissionResult.score)">
+              <div class="score-number">{{ submissionResult.score }}</div>
+              <div class="score-label">Pass rate:</div>
+            </div>
+
             <!-- Stars Display -->
             <div class="mb-4">
+              <div class="score-label mb-2 text-muted">Style Score</div>
               <div class="stars-display">
                 <i
                   v-for="n in 3"
@@ -120,12 +127,6 @@
                 ></i>
               </div>
               <p class="mt-2 text-muted">{{ submissionResult.stars }} / 3 Stars</p>
-            </div>
-
-            <!-- Score Display -->
-            <div class="score-circle mx-auto mb-4" :class="getScoreClass(submissionResult.score)">
-              <div class="score-number">{{ submissionResult.score }}</div>
-              <div class="score-label">Style Score</div>
             </div>
 
             <!-- Message based on performance -->
@@ -194,8 +195,15 @@
                     <i class="bi bi-person-fill me-2"></i>You
                   </h5>
 
+                  <!-- Score Circle -->
+                  <div class="score-circle-small mx-auto mb-3" :class="getScoreClass(rivalResult.userScore)">
+                    <div class="score-number-small">{{ rivalResult.userScore }}</div>
+                    <div class="score-label-small">Pass rate:</div>
+                  </div>
+
                   <!-- Stars -->
                   <div class="text-center mb-3">
+                    <div class="score-label-small mb-2 text-muted">Style Score</div>
                     <div class="stars-display-small">
                       <i
                         v-for="n in 3"
@@ -204,12 +212,6 @@
                       ></i>
                     </div>
                     <p class="small text-muted mb-0">{{ rivalResult.userStars }} / 3 Stars</p>
-                  </div>
-
-                  <!-- Score Circle -->
-                  <div class="score-circle-small mx-auto" :class="getScoreClass(rivalResult.userScore)">
-                    <div class="score-number-small">{{ rivalResult.userScore }}</div>
-                    <div class="score-label-small">Style Score</div>
                   </div>
                 </div>
               </div>
@@ -221,8 +223,15 @@
                     <i class="bi bi-robot me-2"></i>Rival ({{ capitalizeFirst(rivalDifficulty) }})
                   </h5>
 
+                  <!-- Score Circle -->
+                  <div class="score-circle-small mx-auto mb-3" :class="getScoreClass(rivalResult.rivalScore)">
+                    <div class="score-number-small">{{ rivalResult.rivalScore }}</div>
+                    <div class="score-label-small">Pass rate:</div>
+                  </div>
+
                   <!-- Stars -->
                   <div class="text-center mb-3">
+                    <div class="score-label-small mb-2 text-muted">Style Score</div>
                     <div class="stars-display-small">
                       <i
                         v-for="n in 3"
@@ -231,12 +240,6 @@
                       ></i>
                     </div>
                     <p class="small text-muted mb-0">{{ rivalResult.rivalStars }} / 3 Stars</p>
-                  </div>
-
-                  <!-- Score Circle -->
-                  <div class="score-circle-small mx-auto" :class="getScoreClass(rivalResult.rivalScore)">
-                    <div class="score-number-small">{{ rivalResult.rivalScore }}</div>
-                    <div class="score-label-small">Style Score</div>
                   </div>
                 </div>
               </div>
@@ -436,9 +439,9 @@ export default {
       setTimeout(() => (this.showErrorPopup = false), 5000)
     },
     getScoreClass(score) {
-      if (score >= 9) return 'score-excellent'
-      if (score >= 7) return 'score-good'
-      if (score >= 5) return 'score-fair'
+      if (score >= 90) return 'score-excellent'
+      if (score >= 70) return 'score-good'
+      if (score >= 50) return 'score-fair'
       return 'score-poor'
     },
     getMessageClass(stars) {

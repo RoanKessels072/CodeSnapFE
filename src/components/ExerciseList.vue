@@ -45,7 +45,7 @@
                     :class="n <= getBestAttempt(exercise.id).stars ? 'bi bi-star-fill text-warning' : 'bi bi-star text-muted'"
                   ></i>
                 </div>
-                <small class="text-muted">Score: {{ getBestAttempt(exercise.id).score }}/10</small>
+                <small class="text-muted">Score: {{ getBestAttempt(exercise.id).score }}/100</small>
               </div>
             </div>
 
