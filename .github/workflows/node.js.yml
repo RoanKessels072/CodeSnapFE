@@ -50,3 +50,18 @@ jobs:
           context: .
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/codesnapfe:latest
+          build-args: |
+            VITE_API_BASE_URL=${{ vars.VITE_API_BASE_URL }}
+            VITE_KEYCLOAK_URL=${{ vars.VITE_KEYCLOAK_URL }}
+
+#      - name: Deploy to Kubernetes
+#        if: github.ref == 'refs/heads/main'
+#        uses: azure/k8s-set-context@v3
+#        with:
+#          method: kubeconfig
+#          kubeconfig: ${{ secrets.KUBE_CONFIG }}
+#
+#      - name: Rollout Restart
+#        if: github.ref == 'refs/heads/main'
+#        run: |
+#          kubectl rollout restart deployment/codesnap-fe

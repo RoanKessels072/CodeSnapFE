@@ -54,6 +54,7 @@ async function submit() {
   loading.value = true;
 
   try {
+    console.log("Submitting", props.mode);
     if (props.mode === 'rival') {
       await submitRivalMode();
     } else {
@@ -81,6 +82,7 @@ async function submitAssistantMode() {
 }
 
 async function submitRivalMode() {
+  console.log("Submitting rival mode");
   const response = await api.post('/ai/rival', {
     exercise_id: props.exerciseId,
     exercise_name: props.exercise?.name || 'Unknown Exercise',
@@ -97,6 +99,7 @@ async function submitRivalMode() {
 
   let userAttempt = response.data.user_attempt;
   const aiRival = response.data.ai_rival;
+  console.log("AI Rival", aiRival);
   if (!userAttempt) {
     console.error('Missing user_attempt in response:', response.data);
     throw new Error('Invalid response: missing user_attempt');

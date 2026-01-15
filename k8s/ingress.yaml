@@ -1,0 +1,20 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: codesnap-fe-ingress
+  annotations:
+    # AWS Controller annotations would go here if needed
+    # alb.ingress.kubernetes.io/scheme: internet-facing
+spec:
+  ingressClassName: alb # or nginx
+  rules:
+    - host: codesnap.yourdomain.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: codesnap-fe
+                port:
+                  number: 80

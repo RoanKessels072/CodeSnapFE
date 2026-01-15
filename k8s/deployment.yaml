@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: codesnap-fe
+  labels:
+    app: codesnap-fe
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: codesnap-fe
+  template:
+    metadata:
+      labels:
+        app: codesnap-fe
+    spec:
+      containers:
+        - name: codesnap-fe
+          image: roankessels072/codesnapfe:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 80
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          resources:
+            requests:
+              cpu: '100m'
+              memory: '128Mi'
+            limits:
+              cpu: '500m'
+              memory: '512Mi'
