@@ -5,10 +5,10 @@ metadata:
   labels:
     app: codesnap-fe
 spec:
-  type: LoadBalancer
+  type: ClusterIP
   selector:
     app: codesnap-fe
   ports:
-    - port: 5173
+    - port: 80
       targetPort: 80
       protocol: TCP

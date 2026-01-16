@@ -1,16 +1,21 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: codesnap-fe-ingress
+  name: codesnap-app-ingress
+  namespace: default
   annotations:
-    # AWS Controller annotations would go here if needed
-    # alb.ingress.kubernetes.io/scheme: internet-facing
+    kubernetes.io/ingress.class: traefik
+    cert-manager.io/cluster-issuer: 'letsencrypt-prod'
 spec:
-  ingressClassName: alb # or nginx
+  tls:
+    - hosts:
+        - 3.64.180.31.sslip.io
+      secretName: codesnap-tls-prod-v1 # The original working secret name
   rules:
-    - host: codesnap.yourdomain.com
+    - host: 3.64.180.31.sslip.io
       http:
         paths:
+          # Main Frontend
           - path: /
             pathType: Prefix
             backend:
@@ -18,3 +23,27 @@ spec:
                 name: codesnap-fe
                 port:
                   number: 80
+          # Keycloak Backend (Subpath)
+          - path: /auth
+            pathType: Prefix
+            backend:
+              service:
+                name: keycloak
+                port:
+                  number: 8080
+          # Required for Keycloak Login UI Assets
+          - path: /resources
+            pathType: Prefix
+            backend:
+              service:
+                name: keycloak
+                port:
+                  number: 8080
+          # Required for Login Protocols
+          - path: /realms
+            pathType: Prefix
+            backend:
+              service:
+                name: keycloak
+                port:
+                  number: 8080

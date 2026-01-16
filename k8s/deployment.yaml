@@ -14,10 +14,12 @@ spec:
       labels:
         app: codesnap-fe
     spec:
+      imagePullSecrets:
+        - name: ecr-secret
       containers:
         - name: codesnap-fe
-          image: roankessels072/codesnapfe:latest
-          imagePullPolicy: Never
+          image: 239861161036.dkr.ecr.eu-central-1.amazonaws.com/codesnap/codesnapfe:v1
+          imagePullPolicy: Always
           ports:
             - containerPort: 80
           livenessProbe:
@@ -30,12 +32,12 @@ spec:
             httpGet:
               path: /
               port: 80
-            initialDelaySeconds: 5
+            initialDelaySeconds: 15
             periodSeconds: 5
           resources:
             requests:
-              cpu: '100m'
-              memory: '128Mi'
+              cpu: '50m'
+              memory: '64Mi'
             limits:
               cpu: '500m'
-              memory: '512Mi'
+              memory: '256Mi'
