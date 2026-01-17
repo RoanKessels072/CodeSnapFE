@@ -10,20 +10,51 @@ spec:
   tls:
     - hosts:
         - 3.64.180.31.sslip.io
-      secretName: codesnap-tls-prod-v1 # The original working secret name
+      secretName: codesnap-tls-prod-v1
   rules:
     - host: 3.64.180.31.sslip.io
       http:
         paths:
-          # Main Frontend
-          - path: /
+          - path: /exercises
             pathType: Prefix
             backend:
               service:
-                name: codesnap-fe
+                name: api-gateway
                 port:
-                  number: 80
-          # Keycloak Backend (Subpath)
+                  number: 8000
+
+          - path: /attempts
+            pathType: Prefix
+            backend:
+              service:
+                name: api-gateway
+                port:
+                  number: 8000
+
+          - path: /users
+            pathType: Prefix
+            backend:
+              service:
+                name: api-gateway
+                port:
+                  number: 8000
+
+          - path: /code
+            pathType: Prefix
+            backend:
+              service:
+                name: api-gateway
+                port:
+                  number: 8000
+
+          - path: /ai
+            pathType: Prefix
+            backend:
+              service:
+                name: api-gateway
+                port:
+                  number: 8000
+
           - path: /auth
             pathType: Prefix
             backend:
@@ -31,7 +62,6 @@ spec:
                 name: keycloak
                 port:
                   number: 8080
-          # Required for Keycloak Login UI Assets
           - path: /resources
             pathType: Prefix
             backend:
@@ -39,7 +69,6 @@ spec:
                 name: keycloak
                 port:
                   number: 8080
-          # Required for Login Protocols
           - path: /realms
             pathType: Prefix
             backend:
@@ -47,3 +76,17 @@ spec:
                 name: keycloak
                 port:
                   number: 8080
+          - path: /js
+            pathType: Prefix
+            backend:
+              service:
+                name: keycloak
+                port:
+                  number: 8080
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: codesnap-fe
+                port:
+                  number: 80

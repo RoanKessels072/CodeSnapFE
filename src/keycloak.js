@@ -11,7 +11,7 @@ export const state = reactive({
 export function initKeycloak() {
   return new Promise((resolve, reject) => {
     keycloak = new Keycloak({
-      url: import.meta.env.VITE_KEYCLOAK_URL || "http://localhost:8080",
+      url: "https://3.64.180.31.sslip.io/auth",
       realm: "codesnap",
       clientId: "codesnap-client"
     });
