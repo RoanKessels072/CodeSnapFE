@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: codesnap-fe
-          image: roankessels/codesnapfe:latest
+          image: roankessels/codesnapfe:1db933ffb419546af02465668ec3485e9f7aefdd
           imagePullPolicy: Always
           ports:
             - containerPort: 80
