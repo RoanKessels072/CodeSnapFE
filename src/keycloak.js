@@ -16,14 +16,24 @@ export function initKeycloak() {
       clientId: "codesnap-client"
     });
 
+    // Restore tokens from localStorage if available
+    const storedToken = localStorage.getItem('kc_token');
+    const storedRefreshToken = localStorage.getItem('kc_refreshToken');
+
     keycloak.init({
-      onLoad: "login-required",
+      onLoad: "check-sso",
       checkLoginIframe: false,
       pkceMethod: 'S256',
+      token: storedToken || undefined,
+      refreshToken: storedRefreshToken || undefined,
     }).then(authenticated => {
       state.authenticated = !!authenticated;
 
       if (authenticated) {
+        // Store tokens in localStorage for persistence across refreshes
+        localStorage.setItem('kc_token', keycloak.token);
+        localStorage.setItem('kc_refreshToken', keycloak.refreshToken);
+
         keycloak.loadUserProfile().then(profile => {
           state.userProfile = profile;
         }).catch(err => {
@@ -31,11 +41,18 @@ export function initKeycloak() {
         });
 
         startTokenRefresh();
+      } else {
+        // Clear stored tokens if not authenticated
+        localStorage.removeItem('kc_token');
+        localStorage.removeItem('kc_refreshToken');
       }
 
       resolve(keycloak);
     }).catch(err => {
       console.error("Keycloak init error:", err);
+      // Clear tokens on error
+      localStorage.removeItem('kc_token');
+      localStorage.removeItem('kc_refreshToken');
       reject(err);
     });
   });
@@ -67,12 +84,16 @@ export function logout() {
     return;
   }
 
+  // Clear stored tokens
+  localStorage.removeItem('kc_token');
+  localStorage.removeItem('kc_refreshToken');
+  state.authenticated = false;
+  state.userProfile = null;
+
   keycloak.logout({
     redirectUri: window.location.origin
   }).catch(err => {
     console.error("Logout failed:", err);
-    state.authenticated = false;
-    state.userProfile = null;
   });
 }
 
@@ -80,7 +101,12 @@ function startTokenRefresh() {
   setInterval(() => {
     keycloak.updateToken(60)
       .then(refreshed => {
-        if (refreshed) console.log("Keycloak token refreshed");
+        if (refreshed) {
+          console.log("Keycloak token refreshed");
+          // Update stored tokens
+          localStorage.setItem('kc_token', keycloak.token);
+          localStorage.setItem('kc_refreshToken', keycloak.refreshToken);
+        }
       })
       .catch(() => {
         console.warn("Failed to refresh token, logging out");
