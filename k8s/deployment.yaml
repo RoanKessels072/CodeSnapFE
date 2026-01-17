@@ -14,11 +14,9 @@ spec:
       labels:
         app: codesnap-fe
     spec:
-      imagePullSecrets:
-        - name: ecr-secret
       containers:
         - name: codesnap-fe
-          image: 239861161036.dkr.ecr.eu-central-1.amazonaws.com/codesnap/codesnapfe:v4
+          image: roankessels/codesnapfe:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 80
