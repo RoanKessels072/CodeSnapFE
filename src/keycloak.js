@@ -17,9 +17,8 @@ export function initKeycloak() {
     });
 
     keycloak.init({
-      onLoad: "check-sso",
+      onLoad: "login-required",
       checkLoginIframe: false,
-      silentCheckSsoRedirectUri: window.location.origin + "/silent-check-sso.html",
       pkceMethod: 'S256',
     }).then(authenticated => {
       state.authenticated = !!authenticated;
