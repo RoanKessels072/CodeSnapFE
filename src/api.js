@@ -3,7 +3,7 @@ import { getToken } from "./keycloak";
 
 
 const api = axios.create({
-  baseURL: "https://3.64.180.31.sslip.io",
+  baseURL: "https://3.64.180.31.sslip.io/api",
 });
 
 api.interceptors.request.use(config => {

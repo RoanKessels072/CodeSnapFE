@@ -15,7 +15,7 @@ spec:
     - host: 3.64.180.31.sslip.io
       http:
         paths:
-          - path: /exercises
+          - path: /api/exercises
             pathType: Prefix
             backend:
               service:
@@ -23,7 +23,7 @@ spec:
                 port:
                   number: 8000
 
-          - path: /attempts
+          - path: /api/attempts
             pathType: Prefix
             backend:
               service:
@@ -31,7 +31,7 @@ spec:
                 port:
                   number: 8000
 
-          - path: /users
+          - path: /api/users
             pathType: Prefix
             backend:
               service:
@@ -39,7 +39,7 @@ spec:
                 port:
                   number: 8000
 
-          - path: /code
+          - path: /api/code
             pathType: Prefix
             backend:
               service:
@@ -47,7 +47,7 @@ spec:
                 port:
                   number: 8000
 
-          - path: /ai
+          - path: /api/ai
             pathType: Prefix
             backend:
               service:
